@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- This launch file is for Cartographer SLAM -->
+	<!-- It also publish odom -> base_footprint TF when launched -->
+
+	<!-- Transformation Configuration -->
+	<node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" args="0.085 0 0.22 0 0 0 base_link laser 10" />
+	<!-- base_link to imu_link will be provided by the iahrs_driver -->
+	<node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0.09 0 0 0 base_footprint base_link 10" />
+	<!-- map to odom will be provided by the AMCL -->
+	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 map odom 30" />
+	<!--<node pkg="tf" type="static_transform_publisher" name="odom_broadcaster" args="0 0 0 0 0 0 odom base_footprint 30" />-->
+
+	<!-- Launch IMU(Iahrs) -->
+	<!-- Publish : /imu/data -->
+	<param name="m_bSingle_TF_option" type="bool" value="true" /> <!--false-->
+	<node pkg="iahrs_driver" type="iahrs_driver" name="iahrs_driver" output="screen" />
+
+	<!-- AMCL configuration for differential drive robots for Localization -->
+	<!-- Subscribe: /scan, /tf, /initialpose, /map -->
+	<!-- Publish: /amcl_pose, /particlecloud, /tf -->
+	<node pkg="amcl" type="amcl" name="amcl">
+	<param name="use_map_topic" value="true"/>
+	<param name="initial_pose_x" value="0"/>
+	<param name="initial_pose_y" value="0"/>
+	<param name="initial_pose_a" value="0"/>
+	<param name="min_particles" value="500"/>
+	<param name="max_particles" value="5000"/>
+	<param name="update_min_a" value="0.2"/>
+	<param name="update_min_d" value="0.5"/>
+	<param name="odom_model_type" value="diff"/>
+	<param name="odom_alpha1" value="0.2"/>
+	<param name="odom_alpha2" value="0.2"/>
+	<param name="odom_alpha3" value="0.8"/>
+	<param name="odom_alpha4" value="0.2"/>
+	<param name="laser_model_type" value="likelihood_field"/>
+	<param name="laser_likelihood_max_dist" value="2.0"/>
+	<param name="laser_model_likelihood_max_dist" value="2.0"/>
+	<remap from="scan" to="/scan"/>
+	</node>
+	
+	<!-- Launch Lidar(RPLidarA1) -->
+	<!-- Publish : /scan -->
+	<node name="rplidarNode"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
+	<param name="serial_port"         type="string" value="/dev/ttyRPLidar"/>
+	<param name="serial_baudrate"     type="int"    value="115200"/>
+	<param name="frame_id"            type="string" value="laser"/>
+	<param name="inverted"            type="bool"   value="false"/>
+	<param name="angle_compensate"    type="bool"   value="true"/>
+	</node>
+    
+	<!-- Launch Motor Driver(MD200T) -->
+	<node pkg="md" type="md_robot_node" name="md_robot_node" output="screen">
+	<param name = "use_MDUI"                    value = "0"/>       <!-- 0: not use MDUI, 1: use MDUI -->
+	<param name = "wheel_radius"                value = "0.095"/>  <!-- unit: meter -->
+	<param name = "wheel_length"                value = "0.407"/>    <!-- unit: meter -->
+	<param name = "motor_pole"                  value = "8"/> 
+	<param name = "reduction"                   value = "15"/> 	    <!-- Reduction Ratio : 1/15 -->
+	<param name = "reverse_direction"           value = "0"/>       <!-- 0: forward, 1: reverse -->
+	<param name = "maxrpm"                      value = "3000"/>    <!-- unit: RPM -->
+	<param name = "motor_posi"                  value = "1"/>       <!-- motor pisition 0: hall sensor, 1: encoder -->
+	<param name = "encoder_PPR"                 value = "16384"/>    <!-- if use encoder position, encoder PPR -->
+	<param name = "position_proportion_gain"    value = "20"/>      <!-- reference PID 203(PID_GAIN) -->
+	<param name = "speed_proportion_gain"       value = "50"/>      <!-- reference PID 203(PID_GAIN) -->
+	<param name = "integral_gain"               value = "1800"/>    <!-- reference PID 203(PID_GAIN) -->
+	<param name = "slow_start"                  value = "300"/>     <!-- unit: RPM -->
+	<param name = "slow_down"                   value = "300"/>     <!-- unit: RPM -->
+	</node>
+	
+	<!-- Wheel Odometry Publisher -->
+	<!-- Subscribe: /right_ticks, /left_ticks, /initial_2d -->
+	<!-- Publish: /odom_data_euler, /odom_data_quat -->
+	<node pkg="localization_data" type="ekf_odom_pub" name="ekf_odom_pub">
+	</node>
+	
+	<!-- Initial Pose and Goal Publisher(Rviz) -->
+	<!-- Publish: /initialpose, /move_base_simple/goal -->
+	
+	<!-- Subscribe: /initialpose, /move_base_simple/goal -->
+	<!-- Publish: /initial_2d, /goal_2d --> 
+	<!-- Launch rviz_click_to_2d node -->
+	<node pkg="localization_data" type="rviz_click_to_2d" name="rviz_click_to_2d">
+	</node>
+
+	<!-- Move Base Node -->
+	<!-- Subscribe: /move_base_simple/goal -->
+	<!-- Publish: /cmd_vel -->
+	<include file="$(find navstack)/launch/move_base.launch"/>
+	
+</launch>

@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Define AMCL`s various parameters -->
+    
+    <!-- AMCL configuration for differential drive robots for Localization -->
+    <!-- Subscribe: /scan, /tf, /initialpose, /map -->
+    <!-- Publish: /amcl_pose, /particlecloud, /tf -->
+    <node pkg="amcl" type="amcl" name="amcl" output="screen">
+    <param name="odom_model_type" value="diff"/>
+    
+    <remap from="scan" to="scan_filtered"/>     <!-- Change scan topic to filtered topic -->
+
+    <param name="global_frame_id" value="map"/>
+    <param name="odom_frame_id" value="odom"/>
+    <param name="base_frame_id" value="base_footprint"/>
+        
+    <!-- Use these parameters if you want to set robot`s initial pose manually-->
+    <!-- <param name="initial_pose_x" value="0"/> -->  <!-- Set robot`s initial x pose -->
+    <!-- <param name="initial_pose_y" value="0"/> -->  <!-- Set robot`s initial y pose -->
+    <!-- <param name="initial_pose_z" value="0"/> -->  <!-- Set robot`s initial z pose -->
+        
+    <!-- Transform tolerance time (sec) -->
+    <param name="transform_tolerance" value="1.0"/> <!-- IMPORTANT -->
+        
+    <!-- Publish scans from best pose at a max of 10 Hz -->
+    <param name="odom_alpha5" value="0.1"/>        
+        
+    <!-- Set maximum and minimum particle numbers -->
+    <param name="min_particles" value="500"/>
+    <param name="max_particles" value="5000"/>      <!-- 5000 -->
+    
+    <!-- Required Translation (meter) and Angular(radian) -->
+    <param name="update_min_d" value="0.1"/>
+    <param name="update_min_a" value="0.2"/>        
+    
+    <param name="resample_interval" value="1"/>
+    <param name="recovery_alpha_slow" value="0.0"/>
+    <param name="recovery_alpha_fast" value="0.0"/>
+        
+    <param name="gui_publish_rate" value="10.0"/>
+        
+    <!-- Maximum Error between Actual distribution and estimated distribution -->
+    <param name="kld_err" value="0.05"/>
+    <param name="kld_z" value="0.99"/>
+    
+    <!-- Estimated noise of odometry`s rotational momentum when rotating  -->
+    <param name="odom_alpha1" value="0.2"/>
+    <!-- Estimated noise of odometry`s rotational momentum when doing translational momentum -->
+    <param name="odom_alpha2" value="0.2"/>
+    
+    <!-- translation std dev, m -->
+    <!-- Estimated noise of odometry`s translational momentum when doing translational momentum -->
+    <param name="odom_alpha3" value="0.8"/>
+    <!-- Estimated noise of odometry`s translational momentum when rotating -->
+    <param name="odom_alpha4" value="0.2"/>
+        
+    <!-- Laser Configuraton -->
+    <!-- Maximum number of laser beam when update the filter --> 
+    <!-- RPLidar A1`s max laser beam is 360, A2 is 16384 -->
+    <param name="laser_max_beams" value="30"/>
+    <!-- Sensor model`s z_hit, z_max and z_rand mixture weight -->
+    <!-- All of following wieh -->
+    <param name="laser_z_hit" value="0.5"/>
+    <param name="laser_z_short" value="0.05"/>
+    <param name="laser_z_max" value="0.05"/>
+    <param name="laser_z_rand" value="0.5"/>
+    <param name="laser_sigma_hit" value="0.2"/>
+    <!-- Gaussian model`s Standard Deviation using sensor`s z_hit -->
+    <param name="laser_lambda_short" value="0.1"/>
+    <param name="laser_model_type" value="likelihood_field"/>
+    <!-- <param name="laser_model_type" value="beam"/> -->
+    <!-- Maximum distance to obstacle for likelihood_field method sensor -->
+    <param name="laser_likelihood_max_dist" value="2.0"/>          
+    
+</node>
+</launch>

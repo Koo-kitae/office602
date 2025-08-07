@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- Use this file to launch Map server, Odometry Publisher, EKF, AMCL and Move_base Node -->
+	<!-- This file should launched at ROS Master PC -->
+	
+    <!-- Map File -->
+    <arg name="map_file" default="/home/lim/catkin_ws/maps/capstone.yaml"/>
+	
+	<!-- Map Server -->
+	<!-- Publish: /map, /map_metadata -->
+	<node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)" />
+
+	<!-- Initial Pose and Goal Publisher -->
+	<!-- Publish: /initialpose, /move_base_simple/goal -->
+	<!-- Launch Rviz -->
+	<node pkg="rviz" type="rviz" name="rviz" args="-d /home/lim/catkin_ws/rviz_config/navigation.rviz">
+	</node>
+	
+	<!-- Wheel Odometry Publisher -->
+	<!-- Subscribe: /right_ticks, /left_ticks, /initial_2d -->
+	<!-- Publish: /odom_data_euler, /odom_data_quat -->
+	<node pkg="localization_data" type="ekf_odom_pub" name="ekf_odom_pub">
+	</node>
+
+	<!-- Launch OpenCV Objective Tracking 
+	<node pkg="opencv_object_tracking" type="object_filter" name="object_filter">-->
+	
+	<!-- Subscribe: /initialpose, /move_base_simple/goal -->
+	<!-- Publish: /initial_2d, /goal_2d --> 
+	<!-- Launch rviz_click_to_2d node -->
+	<node pkg="localization_data" type="rviz_click_to_2d" name="rviz_click_to_2d">
+	</node>
+
+	<!-- Extended Kalman Filter from robot_pose_ekf Node-->
+	<!-- Subscribe: /odom, /imu_data, /vo -->
+	<!-- Publish: /robot_pose_ekf/odom_combined, TF to odom -> base_footprint -->
+	<remap from="odom" to="odom_data_quat" />
+	<remap from="imu_data" to="imu/data" />
+	<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+	<param name="output_frame" value="odom"/>
+	<param name="base_footprint_frame" value="base_footprint"/>
+	<param name="freq" value="30.0"/>
+	<param name="sensor_timeout" value="1.0"/>
+	<param name="odom_used" value="true"/>
+	<param name="imu_used" value="true"/>
+	<param name="vo_used" value="false"/>
+	<param name="gps_used" value="false"/>
+	<param name="debug" value="false"/>
+	<param name="self_diagnose" value="false"/>
+	</node>
+	
+	<!-- Launch AMCL node for differential drive robots for Localization -->
+	<!-- Subscribe:/scan, /tf, /initial_pose, /map -->
+	<!-- Publish: /amcl_pose, /particlecloud, /tf -->
+	<include file="$(find navstack)/launch/amcl.launch"/>
+    
+	<!-- Move Base Node -->
+	<!-- Subscribe: /move_base_simple/goal -->
+	<!-- Publish: /cmd_vel -->
+	<include file="$(find navstack)/launch/move_base.launch"/>
+
+</launch>

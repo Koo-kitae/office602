@@ -1,0 +1,37 @@
+# footprint: [[-0.2625, 0.2725], [0.2625, 0.2725], [0.2625, -0.2725], [-0.2625, -0.2725]]
+footprint: [[-0.3, 0.3], [0.3, 0.3], [0.3, -0.3], [-0.3, -0.3]]
+
+transform_tolerance: 2.0
+
+map_type: costmap   # voxel
+
+obstacle_layer:
+  enabled: true  
+  max_obstacle_height: 0.5  # 1.113     # Maximum height of obstacles to consider
+  obstacle_range: 3.0
+  raytrace_range: 3.2
+  
+  combination_method:   1         # Method used to combine multiple obsevations. 1 represents maximum-likehood estimation
+  track_unknown_space:  true      # Indicates whether to track unknown space in the costmap. Prevents converting all unknwon space to free space
+  publish_voxel_map: false
+
+  observation_sources: laser_scan_sensor
+  laser_scan_sensor: {sensor_frame: laser, data_type: LaserScan, topic: scan, marking: true, clearing: true}
+
+  ## Only Used for Voxel Layer (VoxelCostmapPlugin)
+  # origin_z:             0.0       # Origin height for the costmap
+  # z_resolution:         0.2       # Parameters related to voxel height representation wth z_voxels
+  # z_voxels:             10        # Threshold value above which a voxel is considered unknown
+  # unknown_threshold:    15        # Threshold value above that indicates whether a cell is considered unknown or not
+  # mark_threshold:       0         # Threshold value below that indicates whether a cell is considered free
+
+inflation_layer:
+  enabled: true
+  cost_scaling_factor: 2.58   # 1.5
+  inflation_radius: 1.75      # 2.0   # Scaling factor applied to the cost values around obstacles
+                                # The best path is for the robot to pass through a center of between obstacles,
+                                # so set this factor to be smaller in order to far from obstacles
+                                # It is an reciprocal portion
+                                
+static_layer:
+  enabled: true

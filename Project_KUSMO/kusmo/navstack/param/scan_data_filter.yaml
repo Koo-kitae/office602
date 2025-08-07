@@ -1,0 +1,24 @@
+scan_filter_chain:
+- name: ProfileFrontLeft
+  type: laser_filters/LaserScanAngularBoundsFilterInPlace
+  params:
+    lower_angle: 0.838     # 48.0138
+    upper_angle: 1.038     # 59.4730
+
+- name: ProfileBackLeft
+  type: laser_filters/LaserScanAngularBoundsFilterInPlace
+  params:
+    lower_angle: 2.253    # 129.0873
+    upper_angle: 2.451    # 140.4319    
+
+- name: ProfileBackRight
+  type: laser_filters/LaserScanAngularBoundsFilterInPlace
+  params:
+    lower_angle: -2.402    # 222.4756
+    upper_angle: -2.215    # 233.0009
+
+- name: ProfileFrontRight
+  type: laser_filters/LaserScanAngularBoundsFilterInPlace
+  params:
+    lower_angle: -0.982    # 303.7356
+    upper_angle: -0.778    # 315.4239

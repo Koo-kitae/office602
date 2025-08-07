@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- Use this launch file when run localization and AMCL at Embedded Board -->
+	
+	<!-- Transformation Configuration -->
+	<!-- Use static transform publisher because each frames doesn`t change through time-->
+	<node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" args="0.085 0 0.22 0 0 0 base_link laser 10"/>
+	<!-- base_link to imu_link will be provided by the iahrs_driver -->
+	<node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0.09 0 0 0 base_footprint base_link 10"/>
+	<!-- odom to base_footprint transform will be provided by the robot_pose_ekf node -->
+	<!-- map to odom will be provided by the AMCL -->
+	<!--<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 map odom 30" />-->
+	
+	<!-- Launch IMU(Iahrs) -->
+	<!-- Publish : /imu/data, TF to base_link -> laser -->
+	<param name="m_bSingle_TF_option" type="bool" value="true"/> <!--false-->
+	<node pkg="iahrs_driver" type="iahrs_driver" name="iahrs_driver" output="screen"/>
+
+	<node name="ydlidar_lidar_publisher"  pkg="ydlidar_ros_driver"  type="ydlidar_ros_driver_node" output="screen" respawn="false" >
+    <param name="port"               type="string" value="/dev/ttyYDLidar"/>  
+    <param name="frame_id"           type="string" value="laser"/>
+    <param name="ignore_array"       type="string" value=""/>
+    <param name="baudrate"           type="int" value="128000"/>  
+    <param name="lidar_type"         type="int" value="1"/>  
+    <param name="device_type"        type="int" value="0"/>  
+    <param name="sample_rate"        type="int" value="5"/>  
+    <param name="abnormal_check_count" type="int" value="4"/>  
+    <param name="resolution_fixed"    type="bool"   value="true"/>
+    <param name="auto_reconnect"      type="bool"   value="true"/>
+    <param name="reversion"           type="bool"   value="false"/>
+    <param name="inverted"            type="bool"   value="false"/>
+    <param name="isSingleChannel"     type="bool"   value="true"/>
+    <param name="intensity"           type="bool"   value="false"/>
+    <param name="support_motor_dtr"   type="bool"   value="false"/>
+    <param name="invalid_range_is_inf" type="bool"   value="false"/>
+    <param name="point_cloud_preservative" type="bool" value="false"/>
+    <param name="angle_min"    type="double" value="-180" />
+    <param name="angle_max"    type="double" value="180" />
+    <param name="range_min"    type="double" value="0.1" />
+    <param name="range_max"    type="double" value="12.0" />
+    <param name="frequency"    type="double" value="10.0"/>
+    </node>
+
+	<!-- Add laser_filter -->
+	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter" output="screen">
+    <rosparam command="load" file="$(find navstack)/param/scan_data_filter.yaml" />
+    </node>
+
+	<!-- Launch Motor Driver(MD200T) -->
+	<!-- Subscribe: /cmd_vel -->
+	<!-- Publish : /right_ticks, /left_ticks -->
+	<node pkg="md" type="md_robot_node" name="md_robot_node" output="screen">
+    <param name = "use_MDUI"                  value = "0"/>
+    <param name = "serial_port"               value = "ttyUSB0"/>
+    <param name = "serial_baudrate"           value = "19200"/>
+    <param name = "wheel_radius"              value = "0.054"/>
+    <param name = "wheel_length"              value = "0.360"/>
+    <param name = "reduction"                 value = "30"/>
+    <param name = "reverse_direction"         value = "0"/>
+    <param name = "maxrpm"                    value = "300"/>
+    <param name = "enable_encoder"            value = "1"/>
+    <param name = "encoder_PPR"               value = "1024"/>
+    <param name = "slow_start"                value = "300"/>
+    <param name = "slow_down"                 value = "300"/>
+    </node>
+
+    <node pkg="md" type="velocity_converter_unified.py" name="velocity_converter_unified" output="screen" />
+    
+	<!-- Map File -->
+	<arg name="map_file" default="/home/etri/catkin_ws/maps/etri_map.yaml"/>
+	
+	<!-- Map Server -->
+	<!-- Publish: /map, /map_metadata -->
+	<node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)">
+	</node>
+
+	<!-- Wheel Odometry Publisher -->
+	<!-- Subscribe: /right_ticks, /left_ticks, /initial_2d -->
+	<!-- Publish: /odom_data_euler, /odom_data_quat -->
+	<node pkg="localization_data" type="ekf_odom_pub" name="ekf_odom_pub">
+	</node>
+
+	<!-- Subscribe: /initialpose, /move_base_simple/goal -->
+	<!-- Publish: /initial_2d, /goal_2d --> 
+	<!-- Launch rviz_click_to_2d node -->
+	<node pkg="localization_data" type="rviz_click_to_2d" name="rviz_click_to_2d">
+	</node>
+
+	<!-- Extended Kalman Filter from robot_pose_ekf Node-->
+	<!-- Subscribe: /odom, /imu_data, /vo -->
+	<!-- Publish: /robot_pose_ekf/odom_combined, TF to odom -> base_footprint -->
+	<remap from="odom" to="odom_data_quat"/>
+	<remap from="imu_data" to="imu/data"/>
+	<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+	<param name="output_frame" value="odom"/>
+	<param name="base_footprint_frame" value="base_footprint"/>
+	<param name="freq" value="30.0"/>
+	<param name="sensor_timeout" value="1.0"/>
+	<param name="odom_used" value="true"/>
+	<param name="imu_used" value="true"/>
+	<param name="vo_used" value="false"/>
+	<param name="gps_used" value="false"/>
+	<param name="debug" value="false"/>
+	<param name="self_diagnose" value="false"/>
+	</node>
+
+	<!-- Launch Rviz 
+	<node pkg="rviz" type="rviz" name="rviz" args="-d /home/lim/catkin_ws/rviz_config">
+	</node>-->
+    
+	<!-- Add AMCL example for differential drive robots for Localization -->
+	<!-- Subscribe: /scan, /tf, /initialpose, /map -->
+	<!-- Publish: /amcl_pose, /particlecloud, TF to map -> odom-->
+	<include file="$(find navstack)/launch/amcl.launch"/>
+    
+	<!-- Move Base Node -->
+	<!-- Subscribe: /move_base_simple_goal, /map, /tf -->
+	<!-- Publish: /cmd_vel -->
+	<include file="$(find navstack)/launch/move_base.launch"/>
+
+</launch>
