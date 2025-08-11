@@ -143,6 +143,7 @@ int MdReceiveProc(void) //save the identified serial data to defined variable ac
                 MakeMDRobotMessage1(&curr_pid_pnt_main_data);
 
                 PubRobotRPMMessage();
+                PubMotorSpeeds();
             }
             break;
         }

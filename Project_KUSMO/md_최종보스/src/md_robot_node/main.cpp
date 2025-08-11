@@ -2,6 +2,8 @@
 // main.cpp
 // Publisher, Subscrive action added
 #include <geometry_msgs/Twist.h>
+#include <std_msgs/Float32.h>
+#include <cmath>
 
 #include "md_robot_node/global.hpp"
 #include "md_robot_node/main.hpp"
@@ -18,6 +20,9 @@ md::md_robot_msg1 md_robot_msg_pid_pnt_main_data;
 
 ros::Publisher md_robot_message2_pub;
 md::md_robot_msg2 md_robot_msg_pid_robot_monitor;
+
+ros::Publisher left_motor_speed_pub;
+ros::Publisher right_motor_speed_pub;
 
 ROBOT_PARAMETER_t robotParamData;
 
@@ -537,6 +542,9 @@ int main(int argc, char** argv)
 
     md_robot_message1_pub = nh.advertise<md::md_robot_msg1>("md_robot_message1", 10);
     md_robot_message2_pub = nh.advertise<md::md_robot_msg2>("md_robot_message2", 10);
+    
+    left_motor_speed_pub = nh.advertise<std_msgs::Float32>("/left_motor_speed", 10);
+    right_motor_speed_pub = nh.advertise<std_msgs::Float32>("/right_motor_speed", 10);
 
     ROS_INFO("Serial port             : %s", serial_port.c_str());
     ROS_INFO("Baudrate                : %d bps", robotParamData.nBaudrate);
@@ -684,4 +692,27 @@ void PubRobotRPMMessage(void)               // This is the message used by defau
 void PubRobotOdomMessage(void)             // Use only when using MDUI
 {
     md_robot_message2_pub.publish(md_robot_msg_pid_robot_monitor);
+}
+
+void PubMotorSpeeds(void)
+{
+    // 1. 입력 값 가져오기
+    // 주의: 'motor1_rpm'과 'motor2_rpm'은 `md_robot_msg1.msg` 파일에 정의된 변수명입니다.
+    // 만약 변수명이 다르다면 실제 메시지 파일에 정의된 이름으로 바꿔주세요.
+    double left_rpm = md_robot_msg_pid_pnt_main_data.motor1_rpm;
+    double right_rpm = md_robot_msg_pid_pnt_main_data.motor2_rpm;
+    double diameter_m = 0.0535 * 2.0; // 지름(Diameter)을 미터 단위로 계산
+
+    // 2. 속도 계산 (v = (PI * D * N) / 60)
+    float left_speed_mps = (M_PI * diameter_m * left_rpm) / 60.0;
+    float right_speed_mps = (M_PI * diameter_m * right_rpm) / 60.0;
+
+    // 3. 메시지 생성 및 발행
+    std_msgs::Float32 left_speed_msg;
+    left_speed_msg.data = left_speed_mps;
+    left_motor_speed_pub.publish(left_speed_msg);
+
+    std_msgs::Float32 right_speed_msg;
+    right_speed_msg.data = right_speed_mps;
+    right_motor_speed_pub.publish(right_speed_msg);
 }

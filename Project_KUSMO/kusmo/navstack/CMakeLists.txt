@@ -214,5 +214,5 @@ include_directories(
 INCLUDE_DIRECTORIES(/usr/local/lib)
 LINK_DIRECTORIES(/usr/local/lib)
 
-add_executable(send_goal src/send_goal.cpp)
-target_link_libraries(send_goal ${catkin_LIBRARIES})
+# add_executable(send_goal src/send_goal.cpp)
+# target_link_libraries(send_goal ${catkin_LIBRARIES})
