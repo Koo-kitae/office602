@@ -2,8 +2,8 @@ DWAPlannerROS:
 
 ## Robot Configuration Parameters ##
   # Acceleration limit for x, y coordinate and rotation
-  acc_lim_x: 1.2      
-  acc_lim_theta: 1.6  
+  acc_lim_x: 0.5    
+  acc_lim_theta: 0.8  
 
   # Velocity when robot is moving in staright line
   max_vel_trans:  0.8

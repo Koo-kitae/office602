@@ -19,7 +19,7 @@
 
     <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
     <remap from="odom" to="$(arg odom_topic)"/>
-    <remap from="scan" to="/scan_filtered"/>        <!-- Change raw scan data to filtered scan data using laser_filters -->
+    <remap from="scan" to="/scan"/>        <!-- Change raw scan data to filtered scan data using laser_filters -->
     
     <!-- Only set if the 'move_forward-only' argument is 'true' -->
     <!-- min_vel_x of DWA is set to 0.0 -->

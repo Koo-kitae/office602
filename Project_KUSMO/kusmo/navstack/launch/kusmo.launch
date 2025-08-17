@@ -4,9 +4,9 @@
 	
 	<!-- Transformation Configuration -->
 	<!-- Use static transform publisher because each frames doesn`t change through time-->
-	<node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" args="0.085 0 0.22 0 0 0 base_link laser 10"/>
+	<node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" args="-0.114 0 0.242 0 0 0 base_link laser 10"/>
 	<!-- base_link to imu_link will be provided by the iahrs_driver -->
-	<node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0.09 0 0 0 base_footprint base_link 10"/>
+	<node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0.0535 0 0 0 base_footprint base_link 10"/>
 	<!-- odom to base_footprint transform will be provided by the robot_pose_ekf node -->
 	<!-- map to odom will be provided by the AMCL -->
 	<!--<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 map odom 30" />-->
@@ -31,7 +31,7 @@
 
     <param name="resolution_fixed"   		type="bool"   value="true"/>
     <param name="auto_reconnect"   			type="bool"   value="true"/>
-    <param name="reversion"   				type="bool"   value="false"/>
+    <param name="reversion"   				type="bool"   value="true"/>
     <param name="inverted" 				    type="bool"   value="false"/>
     <param name="isSingleChannel"	    	type="bool"   value="true"/>
     <param name="intensity"  			   type="bool"   value="false"/>
@@ -53,26 +53,24 @@
 
 	<!-- Launch Motor Driver(MD200T) -->
 	<!-- Subscribe: /cmd_vel -->
-	<!-- Publish : /right_ticks, /left_ticks -->
+	<!-- Publish : /right_motor_speed, /left_motor_speed -->
 	<node pkg="md" type="md_robot_node" name="md_robot_node" output="screen">
-	<param name = "use_MDUI"                    value = "0"/>       <!-- 0: not use MDUI, 1: use MDUI -->
-	<param name = "wheel_radius"                value = "0.0535"/>   <!-- unit: meter -->
-	<param name = "wheel_length"                value = "0.360"/>   <!-- unit: meter -->
-	<param name = "motor_pole"                  value = "20"/> 
-	<param name = "reduction"                   value = "4.33"/> 	    <!-- Reduction Ratio : 1/15 -->
-	<param name = "reverse_direction"           value = "0"/>       <!-- 0: forward, 1: reverse -->
-	<param name = "maxrpm"                      value = "360"/>    <!-- unit: RPM -->
-	<param name = "motor_posi"                  value = "1"/>       <!-- motor pisition 0: hall sensor, 1: encoder -->
-	<param name = "encoder_PPR"                 value = "1024"/>   <!-- if use encoder position, encoder PPR -->
-	<param name = "position_proportion_gain"    value = "20"/>      <!-- reference PID 203(PID_GAIN) -->
-	<param name = "speed_proportion_gain"       value = "50"/>      <!-- reference PID 203(PID_GAIN) -->
-	<param name = "integral_gain"               value = "1800"/>    <!-- reference PID 203(PID_GAIN) -->
-	<param name = "slow_start"                  value = "300"/>     <!-- unit: RPM -->
-	<param name = "slow_down"                   value = "300"/>     <!-- unit: RPM -->
-	</node>
+        <param name = "use_MDUI"                    value = "0"/>       <!-- 0: not use MDUI, 1: use MDUI -->
+        <param name = "serial_port"                 value = "ttyUSB0"/> <!-- COM port -->
+        <param name = "serial_baudrate"             value = "19200"/>   <!-- Motor controller baudrate -->
+        <param name = "wheel_radius"                value = "0.054"/> <!-- unit: meter -->
+        <param name = "wheel_length"                value = "0.342"/>  <!-- unit: meter -->
+        <param name = "reduction"                   value = "30"/>
+        <param name = "reverse_direction"           value = "0"/>       <!-- 0: forward, 1: reverse -->
+        <param name = "maxrpm"                      value = "1024"/>    <!-- unit: RPM -->
+        <param name = "enable_encoder"              value = "0"/>      <!-- 0: hall sensor, 1: encoder, Use the encoder only when using an in-wheel motor -->
+        <param name = "encoder_PPR"                 value = "900"/>    <!-- if use encoder position, encoder PPR, reference PID 126(PID_PPR) -->
+        <param name = "slow_start"                  value = "300"/>     <!-- unit: RPM -->
+        <param name = "slow_down"                   value = "300"/>     <!-- unit: RPM -->
+    </node>
 
 	<!-- Map File -->
-	<arg name="map_file" default="/home/etri/catkin_ws/maps/etri_map.yaml"/>
+	<arg name="map_file" default="/home/etri/catkin_ws/maps/412map.yaml"/>
 	
 	<!-- Map Server -->
 	<!-- Publish: /map, /map_metadata -->
@@ -123,4 +121,5 @@
 	<!-- Publish: /cmd_vel -->
 	<include file="$(find navstack)/launch/move_base.launch"/>
 
+	<!--node pkg="rviz" type="rviz" name="rviz" args="-d $(find navstack)/rviz/navigation.rviz" required="true" /-->
 </launch>
