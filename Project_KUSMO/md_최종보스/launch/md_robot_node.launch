@@ -4,8 +4,8 @@
         <param name = "serial_port"                 value = "ttyUSB0"/> <!-- COM port -->
         <param name = "serial_baudrate"             value = "19200"/>   <!-- Motor controller baudrate -->
         <param name = "wheel_radius"                value = "0.054"/> <!-- unit: meter -->
-        <param name = "wheel_length"                value = "0.360"/>  <!-- unit: meter -->
-        <param name = "reduction"                   value = "30"/>
+        <param name = "wheel_length"                value = "0.342"/>  <!-- unit: meter -->
+        <param name = "reduction"                   value = "1"/>
         <param name = "reverse_direction"           value = "0"/>       <!-- 0: forward, 1: reverse -->
         <param name = "maxrpm"                      value = "1024"/>    <!-- unit: RPM -->
         <param name = "enable_encoder"              value = "0"/>      <!-- 0: hall sensor, 1: encoder, Use the encoder only when using an in-wheel motor -->

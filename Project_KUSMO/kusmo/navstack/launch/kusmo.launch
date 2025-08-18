@@ -60,17 +60,17 @@
         <param name = "serial_baudrate"             value = "19200"/>   <!-- Motor controller baudrate -->
         <param name = "wheel_radius"                value = "0.054"/> <!-- unit: meter -->
         <param name = "wheel_length"                value = "0.342"/>  <!-- unit: meter -->
-        <param name = "reduction"                   value = "30"/>
+        <param name = "reduction"                   value = "1"/>
         <param name = "reverse_direction"           value = "0"/>       <!-- 0: forward, 1: reverse -->
         <param name = "maxrpm"                      value = "1024"/>    <!-- unit: RPM -->
-        <param name = "enable_encoder"              value = "0"/>      <!-- 0: hall sensor, 1: encoder, Use the encoder only when using an in-wheel motor -->
+        <param name = "enable_encoder"              value = "1"/>      <!-- 0: hall sensor, 1: encoder, Use the encoder only when using an in-wheel motor -->
         <param name = "encoder_PPR"                 value = "900"/>    <!-- if use encoder position, encoder PPR, reference PID 126(PID_PPR) -->
         <param name = "slow_start"                  value = "300"/>     <!-- unit: RPM -->
         <param name = "slow_down"                   value = "300"/>     <!-- unit: RPM -->
     </node>
 
 	<!-- Map File -->
-	<arg name="map_file" default="/home/etri/catkin_ws/maps/412map.yaml"/>
+	<arg name="map_file" default="/home/etri/catkin_ws/maps/6floor.yaml"/>
 	
 	<!-- Map Server -->
 	<!-- Publish: /map, /map_metadata -->
