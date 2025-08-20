@@ -20,10 +20,8 @@ const double initialTheta = 0.00000000001;
 const double PI = 3.141592;
 
 // Robot physical constants
-// const double TICKS_PER_REVOLUTION = 4096*4; // REMOVED: No longer needed
-const double WHEEL_RADIUS = 0.107/2; // Wheel radius in meters - This might still be useful if speed is in rad/s, but assuming m/s for now.
-const double WHEEL_BASE = 0.360; // Center of left tire to center of right tire
-// const double TICKS_PER_METER = TICKS_PER_REVOLUTION/(2*PI*WHEEL_RADIUS); // REMOVED: No longer needed
+const double WHEEL_RADIUS = 0.0535; // Wheel radius in meters - This might still be useful if speed is in rad/s, but assuming m/s for now.
+const double WHEEL_BASE = 0.342; // Center of left tire to center of right tire
 
 // ADDED: Variables to store current wheel speeds and time
 double left_wheel_speed = 0.0;  // m/s
@@ -73,7 +71,7 @@ void publish_quat() {
     nav_msgs::Odometry quatOdom;
     quatOdom.header.stamp = odomNew.header.stamp;
     quatOdom.header.frame_id = "odom";
-    quatOdom.child_frame_id = "base_link"; // As per your launch file, robot_pose_ekf will handle odom->base_footprint. This should be base_footprint.
+    quatOdom.child_frame_id = "base_footprint"; // As per your launch file, robot_pose_ekf will handle odom->base_footprint. This should be base_footprint.
     quatOdom.pose.pose.position.x = odomNew.pose.pose.position.x;
     quatOdom.pose.pose.position.y = odomNew.pose.pose.position.y;
     quatOdom.pose.pose.position.z = odomNew.pose.pose.position.z;

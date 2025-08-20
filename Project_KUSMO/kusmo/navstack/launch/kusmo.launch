@@ -7,13 +7,14 @@
 	<node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" args="-0.114 0 0.242 0 0 0 base_link laser 10"/>
 	<!-- base_link to imu_link will be provided by the iahrs_driver -->
 	<node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0.0535 0 0 0 base_footprint base_link 10"/>
+	<node pkg="tf" type="static_transform_publisher" name="base_to_imu_broadcaster" args="0 0 0.3 0 0 0 base_link imu_link 100" />
 	<!-- odom to base_footprint transform will be provided by the robot_pose_ekf node -->
 	<!-- map to odom will be provided by the AMCL -->
 	<!--<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 map odom 30" />-->
 	
 	<!-- Launch IMU(Iahrs) -->
 	<!-- Publish : /imu/data, TF to base_link -> laser -->
-	<param name="m_bSingle_TF_option" type="bool" value="true"/> <!--false-->
+	<param name="m_bSingle_TF_option" type="bool" value="false"/> <!--false-->
 	<node pkg="iahrs_driver" type="iahrs_driver" name="iahrs_driver" output="screen"/>
 
 	<!-- Launch Lidar(YDLidar) -->
@@ -26,13 +27,13 @@
     <param name="baudrate"    	     	type="int" value="128000"/>  
     <param name="lidar_type"         	type="int" value="1"/>  
     <param name="device_type"          	type="int" value="0"/>  
-    <param name="sample_rate"          	type="int" value="5"/>  
+    <param name="sample_rate"          	type="int" value="9"/>  
     <param name="abnormal_check_count" 	type="int" value="4"/>  
 
     <param name="resolution_fixed"   		type="bool"   value="true"/>
     <param name="auto_reconnect"   			type="bool"   value="true"/>
     <param name="reversion"   				type="bool"   value="true"/>
-    <param name="inverted" 				    type="bool"   value="false"/>
+    <param name="inverted" 				    type="bool"   value="true"/>
     <param name="isSingleChannel"	    	type="bool"   value="true"/>
     <param name="intensity"  			   type="bool"   value="false"/>
     <param name="support_motor_dtr"		   type="bool"   value="false"/>
@@ -43,7 +44,7 @@
     <param name="angle_max"    type="double" value="180" />
     <param name="range_min"    type="double" value="0.1" />
     <param name="range_max"    type="double" value="12.0" />
-    <param name="frequency"    type="double" value="10.0"/>
+    <param name="frequency"    type="double" value="8.0"/>
 	</node>
 
 	<!-- Add laser_filter -->
@@ -58,19 +59,19 @@
         <param name = "use_MDUI"                    value = "0"/>       <!-- 0: not use MDUI, 1: use MDUI -->
         <param name = "serial_port"                 value = "ttyUSB0"/> <!-- COM port -->
         <param name = "serial_baudrate"             value = "19200"/>   <!-- Motor controller baudrate -->
-        <param name = "wheel_radius"                value = "0.054"/> <!-- unit: meter -->
+        <param name = "wheel_radius"                value = "0.0535"/> <!-- unit: meter -->
         <param name = "wheel_length"                value = "0.342"/>  <!-- unit: meter -->
         <param name = "reduction"                   value = "1"/>
         <param name = "reverse_direction"           value = "0"/>       <!-- 0: forward, 1: reverse -->
-        <param name = "maxrpm"                      value = "1024"/>    <!-- unit: RPM -->
+        <param name = "maxrpm"                      value = "300"/>    <!-- unit: RPM -->
         <param name = "enable_encoder"              value = "1"/>      <!-- 0: hall sensor, 1: encoder, Use the encoder only when using an in-wheel motor -->
-        <param name = "encoder_PPR"                 value = "900"/>    <!-- if use encoder position, encoder PPR, reference PID 126(PID_PPR) -->
+        <param name = "encoder_PPR"                 value = "4096"/>    <!-- if use encoder position, encoder PPR, reference PID 126(PID_PPR) -->
         <param name = "slow_start"                  value = "300"/>     <!-- unit: RPM -->
         <param name = "slow_down"                   value = "300"/>     <!-- unit: RPM -->
     </node>
 
 	<!-- Map File -->
-	<arg name="map_file" default="/home/etri/catkin_ws/maps/6floor.yaml"/>
+	<arg name="map_file" default="/home/etri/catkin_ws/maps/6floor3.yaml"/>
 	
 	<!-- Map Server -->
 	<!-- Publish: /map, /map_metadata -->
@@ -78,7 +79,7 @@
 	</node>
 
 	<!-- Wheel Odometry Publisher -->
-	<!-- Subscribe: /right_ticks, /left_ticks, /initial_2d -->
+	<!-- Subscribe: /right_motor_speed, /left_motor_speed, /initial_2d -->
 	<!-- Publish: /odom_data_euler, /odom_data_quat -->
 	<node pkg="localization_data" type="ekf_odom_pub" name="ekf_odom_pub">
 	</node>

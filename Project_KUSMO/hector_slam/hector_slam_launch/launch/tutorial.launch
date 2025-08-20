@@ -52,5 +52,5 @@
         args="0 0 0 0 0 0 base_link laser_frame 10" />
 
   <!-- RViz -->
-  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find hector_slam_launch)/rviz_cfg/mapping_demo.rviz" />
+  <!--node pkg="rviz" type="rviz" name="rviz" args="-d $(find hector_slam_launch)/rviz_cfg/mapping_demo.rviz" /-->
 </launch>

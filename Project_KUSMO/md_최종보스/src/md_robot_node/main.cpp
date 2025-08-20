@@ -701,7 +701,7 @@ void PubMotorSpeeds(void)
     // 만약 변수명이 다르다면 실제 메시지 파일에 정의된 이름으로 바꿔주세요.
     double left_rpm = md_robot_msg_pid_pnt_main_data.motor1_rpm;
     double right_rpm = md_robot_msg_pid_pnt_main_data.motor2_rpm;
-    double diameter_m = 0.0535 * 2.0; // 지름(Diameter)을 미터 단위로 계산
+    double diameter_m = 0.55; // 지름(Diameter)을 미터 단위로 계산
 
     // 2. 속도 계산 (v = (PI * D * N) / 60)
     float left_speed_mps = (M_PI * diameter_m * left_rpm) / 60.0;
