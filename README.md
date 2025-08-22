@@ -1,24 +1,14 @@
 # Project_공원지킴이
 
 
-## Mobile Drainage Collection Robot Development Project 
+## Mobile Garbage Collection Robot
 
-About Project : https://youngseong.tistory.com/229
-
-
+About Notion : https://curved-waterfall-6a0.notion.site/2536d61a9d0c8038a156c464a65c9cc1?source=copy_link
 
 If you encounter the error related to "serial", install serial package with following command : 
 
 ``` bash
 $ sudo apt install ros-noetic-serial
-```
-
-
-
-And if you encounter the error related to opencv, do following process : 
-
-``` bash
-$ sudo gedit /opt/ros/noetic/share/cv_bridge/cmake/cv_bridgeConfig.cmake 
 ```
 
 
